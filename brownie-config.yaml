@@ -1,0 +1,4 @@
+#saves info about where to build and where to look for to grap infor.
+dotenv : .env
+wallets :
+  from_key : ${PRIVATE_KEY}
