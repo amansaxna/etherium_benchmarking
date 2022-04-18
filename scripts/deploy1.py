@@ -41,26 +41,26 @@ def add_treatment(iter):
         '''
         ,"required_confs" : 1
         '''
-        #start = time.time()
+        start = time.time()
 
-        #print(dir(transaction))
+        print(dir(transaction))
         web3.eth.wait_for_transaction_receipt(transaction.txid, timeout=120, poll_latency=0.1)
-        #end = time.time()
-        #print("time elapsed {} milli seconds".format((end-start)*1000))
-        #print("time elapsed {} milli seconds".format((end-start1)*1000))
-        #print("time elapsed {} milli seconds".format((start1-start)*1000))
+        end = time.time()
+        print("time elapsed {} milli seconds".format((end-start)*1000))
+        print("time elapsed {} milli seconds".format((end-start1)*1000))
+        print("time elapsed {} milli seconds".format((start1-start)*1000))
 
-        #while(not web3.eth.wait_for_transaction_receipt(transaction.txid, timeout=120, poll_latency=0.1)):
-        #    print(".")
-        #print("block_number",transaction.block_number)
+        while(not web3.eth.wait_for_transaction_receipt(transaction.txid, timeout=120, poll_latency=0.1)):
+            print(".")
+        print("block_number",transaction.block_number)
         block = web3.eth.get_block(transaction.block_number)
         #block_1 = web3.eth.get_block(transaction.block_number -1 )
-        #print(block.timestamp)
+        print(block.timestamp)
         #print(block_1.timestamp)
-        #print(transaction.confirmations)
-        #print("events", transaction.events)
-        #print("function name", transaction.fn_name)
-        #print("modified_state", transaction.modified_state)
+        print(transaction.confirmations)
+        print("events", transaction.events)
+        print("function name", transaction.fn_name)
+        print("modified_state", transaction.modified_state)
         transaction.wait(1) # wait for 2 confirmation
 
         iter = iter - 1
@@ -86,7 +86,7 @@ def view_history(iter):
     while(iter != 0):
         transaction = records_keeper.viewHistory( {"from": account} )
         #web3.eth.wait_for_transaction_receipt(transaction.txid, timeout=120, poll_latency=0.1)
-        #print(transaction)
+        print(transaction)
         #print(dir(transaction))
 
         #print("modified_state", transaction.modified_state)
@@ -94,100 +94,100 @@ def view_history(iter):
 def get_account():
     if network.show_active() == "development":
         #priority_fee("2 gwei")
-        return accounts[0]
+        return accounts[1]
     else:
         return accounts.add(config["wallets"]["from_key"])
 
-def trans_latency_view_history(no_transaction):
-    #no_transaction = [1,50,100,200,400]
-    #no_transaction_half = [1,50]
-
+def trans_latency_view_history():
+    no_transaction = [1,50,100,150]
+    no_transaction_half = [1,50]
     time_taken = []
     time_taken_read = []
-    throughput_write = []
-    throughput_read = []
 
-    for i in no_transaction:
-        start = time.time()
-        add_treatment(i)
-        end = time.time()
-        #print("time elapsed {} milli seconds".format((end-start)*1000))
-        time_taken.append((end-start)*1000)
-        throughput_i =  i / (end-start)*1000
-        throughput_write.append(throughput_i)
+    start = time.time()
+    add_treatment(1)
+    end = time.time()
+    print("time elapsed {} milli seconds".format((end-start)*1000))
+    time_taken.append((end-start)*1000)
 
-        #-----------------------------------------------------
-        start = time.time()
-        view_history(1)
-        end = time.time()
-        #print("time elapsed {} milli seconds".format((end-start)*1000))
-        time_taken_read.append((end-start)*1000)
-
-        throughput_i =  i / (end-start)*1000
-        throughput_read.append(throughput_i)
+    #-----------------------------------------------------
+    start = time.time()
+    view_history(1)
+    end = time.time()
+    print("time elapsed {} milli seconds".format((end-start)*1000))
+    time_taken_read.append((end-start)*1000)
     
+    
+    
+    start = time.time()
+    add_treatment(50)
+    end = time.time()
+    print("time elapsed {} milli seconds".format((end-start)*1000))
+    time_taken.append((end-start)*1000)
+
+    #-----------------------------------------------------
+    start = time.time()
+    view_history(1)
+    end = time.time()
+    print("time elapsed {} milli seconds".format((end-start)*1000))
+    time_taken_read.append((end-start)*1000)
+    
+
+    start = time.time()
+    add_treatment(100)
+    end = time.time()
+    print("time elapsed {} milli seconds".format((end-start)*1000))
+    time_taken.append((end-start)*1000)
+
+    #-----------------------------------------------------
+    start = time.time()
+    view_history(1)
+    end = time.time()
+    print("time elapsed {} milli seconds".format((end-start)*1000))
+    time_taken_read.append((end-start)*1000)
+    
+    start = time.time()
+    add_treatment(200)
+    end = time.time()
+    print("time elapsed {} milli seconds".format((end-start)*1000))
+    time_taken.append((end-start)*1000)
+
+    #-----------------------------------------------------
+    start = time.time()
+    view_history(1)
+    end = time.time()
+    print("time elapsed {} milli seconds".format((end-start)*1000))
+    time_taken_read.append((end-start)*1000)
+
+'''
     print(time_taken)
     print(time_taken_read)
-    print(throughput_write)
-    print(throughput_read)
-
-    xpoints = np.array(no_transaction)
+    xpoints = np.array(no_transaction_half)
     ypoints = np.array(time_taken)
     plt.plot(xpoints, ypoints)
     plt.savefig("mygraph.png")
     plt.show()
-    plt.xlabel("no_transaction")
-    plt.ylabel("time_taken_write")
-    plt.title("TL")
-    #plt.bar(xpoints, ypoints)
-    plt.grid()
+
+    plt.bar(xpoints, ypoints)
     plt.savefig("write_latency_graph.png")
 
 
-    xpoints = np.array(no_transaction)
+    xpoints = np.array(no_transaction_half)
     ypoints = np.array(time_taken_read)
-
     plt.plot(xpoints, ypoints)
-    plt.xlabel("no_transaction")
-    plt.ylabel("time_taken_read")
-    plt.title("RL")
-    plt.grid()
     plt.savefig("read_latency_graph.png")
     plt.show()
-
-    #+------------------------------------------
-    xpoints = np.array(no_transaction)
-    ypoints = np.array(throughput_write)
-
-    plt.plot(xpoints, ypoints)
-    plt.xlabel("no_transaction")
-    plt.ylabel("throughput_write")
-    plt.title("RL")
-    plt.grid()
-    plt.savefig("throughput_write_graph.png")
-    plt.show()
-
-    #+------------------------------------------
-    xpoints = np.array(no_transaction)
-    ypoints = np.array(throughput_read)
-
-    plt.plot(xpoints, ypoints)
-    plt.xlabel("no_transaction")
-    plt.ylabel("throughput_read")
-    plt.title("RL")
-    plt.grid()
-    plt.savefig("throughput_read_graph.png")
-    plt.show()
-
+'''
 def main():
     deploy_hc()
-    #no_transaction = [1,50,100,200,400,800,1600]
-    no_transaction = [1,50,100,200,400,800,1000]
-    trans_latency_view_history(no_transaction)
+    trans_latency_view_history()
     view_history(1)
     
 
     
+
+
+ 
 
 
  
